@@ -6,7 +6,6 @@ use piston_window::*;
 
 mod cpu;
 
-const ENLARGEMENT: usize = 20;
 
 fn main() {
     let file_name = env::args().nth(1).expect("Must give game name as first file");
@@ -16,7 +15,8 @@ fn main() {
 
     let mut cpu = cpu::Cpu::new(buffer.as_slice());
 
-    let window_dimensions = [(cpu::VIDEO_WIDTH * ENLARGEMENT) as u32, (cpu::VIDEO_HEIGHT * ENLARGEMENT) as u32];
+    const GUI_SCALE: f64 = 10.0;
+    let window_dimensions = [cpu::VIDEO_WIDTH * GUI_SCALE as u32, cpu::VIDEO_HEIGHT * GUI_SCALE as u32];
     let mut window: PistonWindow = WindowSettings::new("Chip-8 Interpreter", window_dimensions)
         .exit_on_esc(true)
         .build()
@@ -27,10 +27,10 @@ fn main() {
             window.draw_2d(&e, |context, graphics, _| {
                 piston_window::clear(color::BLACK, graphics);
 
-                for (i, row) in cpu.video.chunks(cpu::VIDEO_WIDTH).enumerate() {
+                for (i, row) in cpu.video.chunks(cpu::VIDEO_WIDTH as usize).enumerate() {
                     for (j, &val) in row.iter().enumerate() {
                         if val > 0 {
-                            let d = [(j * ENLARGEMENT) as f64, (i * ENLARGEMENT) as f64, ENLARGEMENT as f64, ENLARGEMENT as f64];
+                            let d = [j as f64 * GUI_SCALE, i as f64 * GUI_SCALE, GUI_SCALE, GUI_SCALE];
                             Rectangle::new(color::WHITE)
                                 .draw(d, &context.draw_state, context.transform, graphics);
                         }

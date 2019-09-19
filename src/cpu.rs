@@ -26,8 +26,8 @@ const MEM_FONTS_START: usize = 0x50;
 const MEM_PROGRAM_START: usize = 0x200;
 const MEM_END: usize = 0xFFF;
 
-pub const VIDEO_WIDTH: usize = 64;
-pub const VIDEO_HEIGHT: usize = 32;
+pub const VIDEO_WIDTH: u32 = 64;
+pub const VIDEO_HEIGHT: u32 = 32;
 
 type Register = usize;
 type Memory = usize;
@@ -103,7 +103,7 @@ impl Cpu {
             delay_timer: 0,
             sound_timer: 0,
             keypad: vec![false; 16],
-            video: vec![0; VIDEO_HEIGHT * VIDEO_WIDTH],
+            video: vec![0; (VIDEO_HEIGHT * VIDEO_WIDTH) as usize],
             cur_instruction_num: 0,
         }
     }
@@ -198,7 +198,7 @@ impl Cpu {
             },
             CLS {} => {
                 // Clear the display.
-                self.video = vec![0; VIDEO_HEIGHT * VIDEO_WIDTH];
+                self.video = vec![0; (VIDEO_HEIGHT * VIDEO_WIDTH) as usize];
             },
             RTS {} => {
                 // The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
@@ -320,7 +320,7 @@ impl Cpu {
                     let sprite_byte = sprite[i];
                     for j in 0..8 {
                         let sprite_pixel = sprite_byte & (0b10000000 >> j);
-                        let screen_pixel_idx = (y_pos + i) % VIDEO_HEIGHT * VIDEO_WIDTH + (x_pos + j as usize) % VIDEO_WIDTH;
+                        let screen_pixel_idx = (y_pos + i) % VIDEO_HEIGHT as usize * VIDEO_WIDTH as usize + (x_pos + j as usize) % VIDEO_WIDTH as usize;
                         if sprite_pixel > 0 {
                             self.reg[0xF] |= (self.video[screen_pixel_idx] == 0xFF) as u8;
                             self.video[screen_pixel_idx] ^= 0xFF;

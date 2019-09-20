@@ -1,6 +1,6 @@
 use rand::prelude::*;
 
-use crate::cpu::Instr::*;
+use crate::cpu::Instruction::*;
 
 const SPRITE_SIZE: usize = 5;
 const FONTS: [u8; SPRITE_SIZE * 16] = [
@@ -34,7 +34,7 @@ type Memory = usize;
 
 // @formatter:off
 #[derive(Debug)]
-enum Instr {                                       // instruction in hexadecimal
+enum Instruction {                                       // instruction in hexadecimal
     CLS {},                                        // 00 E0
     RTS {},                                        // 00 EE
     SYS {},                                        // 0n-nn
@@ -133,7 +133,7 @@ impl Cpu {
         }
     }
 
-    fn fetch_instruction(&self) -> Option<Instr> {
+    fn fetch_instruction(&self) -> Option<Instruction> {
         let mask_xo = |byte: u8| (byte & 0b11110000) as usize;
         let mask_ox = |byte: u8| (byte & 0b00001111) as usize;
         let shift_right_xo = |byte: u8| (byte >> 4) as usize;
@@ -191,7 +191,7 @@ impl Cpu {
             _ => None
         }
     }
-    fn execute_instruction(&mut self, instruction: Instr) {
+    fn execute_instruction(&mut self, instruction: Instruction) {
         match instruction {
             SYS {} => {
                 // This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters.
